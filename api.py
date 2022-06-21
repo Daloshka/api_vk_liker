@@ -48,27 +48,31 @@ def like():
         for token in tokens:
             try:
                 session = vk_api.VkApi(token= token)
-                print(f"owner_id' :{owner_id}, 'post_id': {item_id}")
-                session.method('likes.add', {'owner_id' :owner_id, 'item_id': item_id,'type':type_task, 'random_id' : random.randint(1000, 99999)})
-                print("+", end="")
-                likes_done += 1
-                print(f"likes_done {likes_done} count {count}")
-                if (int(count) == int(likes_done)):
-                    database.delete_task(id_task)
-                    task_done(id_task)
-                    time.sleep(5)
-                    print("Задание выполнено!")
-                    break
+                if (session.method('likes.isLiked', {'owner_id' :owner_id, 'item_id': item_id,'type':type_task, 'random_id' : random.randint(1000, 99999)})['liked'] != 1):
+                    print(f"owner_id' :{owner_id}, 'post_id': {item_id}")
+                    session.method('likes.add', {'owner_id' :owner_id, 'item_id': item_id,'type':type_task, 'random_id' : random.randint(1000, 99999)})
+                    print("+", end="")
+                    likes_done += 1
+                    print(f"likes_done {likes_done} count {count}")
+                    if (int(count) == int(likes_done)):
+                        database.delete_task(id_task)
+                        task_done(id_task)
+                        time.sleep(5)
+                        print("Задание выполнено!")
+                        break
             except:
                 print(f"-", end='')
+        database.delete_task(id_task)
+        task_done(id_task)
     except Exception as ex:
         print(f"Error in LIKE {ex}")
 
+
 while True:
     try:
-        get_tasks()
-        print("Попытка принять запросы")
-        time.sleep(2)
+        #get_tasks()
+        #print("Попытка принять запросы")
+        time.sleep(15)
         like()
     except Exception as ex:
         print(f"Error in WHILE TRUE {ex}")
