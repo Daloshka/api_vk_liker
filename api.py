@@ -2,7 +2,6 @@ import time
 import database
 import vk_api
 import random
-import telebot
 import requests
 from info import api_key, server_ip
 
