@@ -36,6 +36,7 @@ def get_tasks():
     except Exception as ex:
         print(f"Error in GET_TASKS {ex}")
 
+
 def task_done(task_id):
     r = requests.get(f"http://{server_ip}/task/done?key={api_key}&task_id={int(task_id)}")    
 
@@ -45,6 +46,8 @@ def like():
         id_task, type_task, owner_id, item_id, count, payInfo = task
         tokens = database.get_active_tokens()
         likes_done = 0
+        counter_tokens = 0
+        length_tokens = len(tokens)
         for token in tokens:
             try:
                 session = vk_api.VkApi(token= token)
@@ -53,7 +56,8 @@ def like():
                     session.method('likes.add', {'owner_id' :owner_id, 'item_id': item_id,'type':type_task, 'random_id' : random.randint(1000, 99999)})
                     print("+", end="")
                     likes_done += 1
-                    print(f"likes_done {likes_done} count {count}")
+                    counter_tokens += 1
+                    print(f"likes_done {likes_done} count {count} progress {counter_tokens}/{length_tokens}")
                     if (int(count) == int(likes_done)):
                         database.delete_task(id_task)
                         task_done(id_task)
@@ -61,18 +65,15 @@ def like():
                         print("Задание выполнено!")
                         break
             except:
-                print(f"-", end='')
-        database.delete_task(id_task)
-        task_done(id_task)
+                counter_tokens += 1
+                print(f"- {counter_tokens}/{length_tokens}\n", end='')
     except Exception as ex:
         print(f"Error in LIKE {ex}")
 
 
 while True:
     try:
-        #get_tasks()
-        #print("Попытка принять запросы")
-        time.sleep(15)
         like()
+        time.sleep(40)
     except Exception as ex:
         print(f"Error in WHILE TRUE {ex}")
